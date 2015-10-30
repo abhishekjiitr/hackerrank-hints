@@ -1,0 +1,40 @@
+B+tree Indexes
+
+Indexes are stored on disk in the form of a data structure known as B+tree. B+tree is in many ways similar to a binary search tree. B+tree follows on the same structure as of a binary search tree, in that each key in a node has all key values less than the key as its left children, and all key values more than the key as its right children.
+But there are some very important differences,
+
+B+tree can have more than 1 keys in a node, in fact thousands of keys is seen typically stored in a node and hence, the branching factor of a B+tree is very large and that allows the B+trees to be a lot shallower as compared to their binary search tree counterparts.
+B+trees have all the key values in their leaf nodes. All the leaf nodes of a B+tree are at the same height, which implies that every index lookup will take same number of B+tree lookups to find a value.
+Within a B+tree all leaf nodes are linked together in a linked-listed, left to right, and since the values at the leaf nodes are sorted, so range lookups are very efficient.
+A typical B+tree
+
+Following is a typical B+tree:
+Bplustree
+
+If you need more information on B+trees, you can have a detailed look at the article available on Wikipedia.
+
+Why use B+tree?
+
+B+tree is used for an obvious reason and that is speed. As we know that there are space limitations when it comes to memory, and not all of the data can reside in memory, and hence majority of the data has to be saved on disk. Disk as we know is a lot slower as compared to memory because it has moving parts. So if there were no tree structure to do the lookup, then to find a value in a database, the DBMS would have to do a sequential scan of all the records. Now imagine a data size of a billion rows, and you can clearly see that sequential scan is going to take very long.
+But with B+tree, its possible to store a billion key values (with pointers to billion rows) at a height of 3, 4 or 5, so that every key lookup out of the billion keys is going to take 3, 4 or 5 disk accesses, which is a huge saving.
+
+The reason why B+tree is chosen over other tree structures is that B+trees tend to be very shallow, and since every lookup translates to a disk access, the number of disk accesses required to fetch a value is directly proportional to the height of the tree, so the shallower the tree, the less number of disk accesses.
+
+How is B+tree structured?
+
+B+trees are normally structured in such a way that the size of a node is chosen according to the page size. Why? Because whenever data is accessed on disk, instead of reading a few bits, a whole page of data is read, because that is much cheaper.
+Let us look at an example,
+Consider InnoDB whose page size is 16KB and suppose we have an index on a integer column of size 4bytes, so a node can contain at most 16 * 1024 / 4 = 4096 keys, and a node can have at most 4097 children.
+So for a B+tree of height 1, the root node has 4096 keys and the nodes at height 1 (the leaf nodes) have 4096 * 4097 = 16781312 key values.
+This goes to show the effectiveness of a B+tree index, more than 16 million key values can be stored in a B+tree of height 1 and every key value can be accessed in exactly 2 lookups.
+
+How important is the size of the index values?
+
+As can be seen from the above example, the size of the index values plays a very important role for the following reasons:
+
+The longer the index, the less number of values that can fit in a node, and hence the more the height of the B+tree.
+The more the height of the tree, the more disk accesses are needed.
+The more the disk accesses the less the performance.
+So the size of the index values have a direct bearing on performance!
+
+I hope you have understood how B+tree indexes work and how they are used to improve the performance of lookups. I hope you have also understood how important it is to keep the height of the B+tree smaller so as to reduce the number of disk accesses.
